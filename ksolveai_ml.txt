@@ -1,0 +1,420 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": []
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "43o_--Kd8kZw",
+        "outputId": "2d939f1b-0264-498f-ad65-8ecdcef72a25",
+        "collapsed": true
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: pandas in /usr/local/lib/python3.10/dist-packages (2.1.4)\n",
+            "Requirement already satisfied: spacy in /usr/local/lib/python3.10/dist-packages (3.7.6)\n",
+            "Requirement already satisfied: transformers in /usr/local/lib/python3.10/dist-packages (4.44.2)\n",
+            "Requirement already satisfied: torch in /usr/local/lib/python3.10/dist-packages (2.4.0+cu121)\n",
+            "Requirement already satisfied: scikit-learn in /usr/local/lib/python3.10/dist-packages (1.3.2)\n",
+            "Requirement already satisfied: numpy<2,>=1.22.4 in /usr/local/lib/python3.10/dist-packages (from pandas) (1.26.4)\n",
+            "Requirement already satisfied: python-dateutil>=2.8.2 in /usr/local/lib/python3.10/dist-packages (from pandas) (2.8.2)\n",
+            "Requirement already satisfied: pytz>=2020.1 in /usr/local/lib/python3.10/dist-packages (from pandas) (2024.2)\n",
+            "Requirement already satisfied: tzdata>=2022.1 in /usr/local/lib/python3.10/dist-packages (from pandas) (2024.1)\n",
+            "Requirement already satisfied: spacy-legacy<3.1.0,>=3.0.11 in /usr/local/lib/python3.10/dist-packages (from spacy) (3.0.12)\n",
+            "Requirement already satisfied: spacy-loggers<2.0.0,>=1.0.0 in /usr/local/lib/python3.10/dist-packages (from spacy) (1.0.5)\n",
+            "Requirement already satisfied: murmurhash<1.1.0,>=0.28.0 in /usr/local/lib/python3.10/dist-packages (from spacy) (1.0.10)\n",
+            "Requirement already satisfied: cymem<2.1.0,>=2.0.2 in /usr/local/lib/python3.10/dist-packages (from spacy) (2.0.8)\n",
+            "Requirement already satisfied: preshed<3.1.0,>=3.0.2 in /usr/local/lib/python3.10/dist-packages (from spacy) (3.0.9)\n",
+            "Requirement already satisfied: thinc<8.3.0,>=8.2.2 in /usr/local/lib/python3.10/dist-packages (from spacy) (8.2.5)\n",
+            "Requirement already satisfied: wasabi<1.2.0,>=0.9.1 in /usr/local/lib/python3.10/dist-packages (from spacy) (1.1.3)\n",
+            "Requirement already satisfied: srsly<3.0.0,>=2.4.3 in /usr/local/lib/python3.10/dist-packages (from spacy) (2.4.8)\n",
+            "Requirement already satisfied: catalogue<2.1.0,>=2.0.6 in /usr/local/lib/python3.10/dist-packages (from spacy) (2.0.10)\n",
+            "Requirement already satisfied: weasel<0.5.0,>=0.1.0 in /usr/local/lib/python3.10/dist-packages (from spacy) (0.4.1)\n",
+            "Requirement already satisfied: typer<1.0.0,>=0.3.0 in /usr/local/lib/python3.10/dist-packages (from spacy) (0.12.5)\n",
+            "Requirement already satisfied: tqdm<5.0.0,>=4.38.0 in /usr/local/lib/python3.10/dist-packages (from spacy) (4.66.5)\n",
+            "Requirement already satisfied: requests<3.0.0,>=2.13.0 in /usr/local/lib/python3.10/dist-packages (from spacy) (2.32.3)\n",
+            "Requirement already satisfied: pydantic!=1.8,!=1.8.1,<3.0.0,>=1.7.4 in /usr/local/lib/python3.10/dist-packages (from spacy) (2.9.1)\n",
+            "Requirement already satisfied: jinja2 in /usr/local/lib/python3.10/dist-packages (from spacy) (3.1.4)\n",
+            "Requirement already satisfied: setuptools in /usr/local/lib/python3.10/dist-packages (from spacy) (71.0.4)\n",
+            "Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.10/dist-packages (from spacy) (24.1)\n",
+            "Requirement already satisfied: langcodes<4.0.0,>=3.2.0 in /usr/local/lib/python3.10/dist-packages (from spacy) (3.4.0)\n",
+            "Requirement already satisfied: filelock in /usr/local/lib/python3.10/dist-packages (from transformers) (3.16.0)\n",
+            "Requirement already satisfied: huggingface-hub<1.0,>=0.23.2 in /usr/local/lib/python3.10/dist-packages (from transformers) (0.24.6)\n",
+            "Requirement already satisfied: pyyaml>=5.1 in /usr/local/lib/python3.10/dist-packages (from transformers) (6.0.2)\n",
+            "Requirement already satisfied: regex!=2019.12.17 in /usr/local/lib/python3.10/dist-packages (from transformers) (2024.5.15)\n",
+            "Requirement already satisfied: safetensors>=0.4.1 in /usr/local/lib/python3.10/dist-packages (from transformers) (0.4.5)\n",
+            "Requirement already satisfied: tokenizers<0.20,>=0.19 in /usr/local/lib/python3.10/dist-packages (from transformers) (0.19.1)\n",
+            "Requirement already satisfied: typing-extensions>=4.8.0 in /usr/local/lib/python3.10/dist-packages (from torch) (4.12.2)\n",
+            "Requirement already satisfied: sympy in /usr/local/lib/python3.10/dist-packages (from torch) (1.13.2)\n",
+            "Requirement already satisfied: networkx in /usr/local/lib/python3.10/dist-packages (from torch) (3.3)\n",
+            "Requirement already satisfied: fsspec in /usr/local/lib/python3.10/dist-packages (from torch) (2024.6.1)\n",
+            "Requirement already satisfied: scipy>=1.5.0 in /usr/local/lib/python3.10/dist-packages (from scikit-learn) (1.13.1)\n",
+            "Requirement already satisfied: joblib>=1.1.1 in /usr/local/lib/python3.10/dist-packages (from scikit-learn) (1.4.2)\n",
+            "Requirement already satisfied: threadpoolctl>=2.0.0 in /usr/local/lib/python3.10/dist-packages (from scikit-learn) (3.5.0)\n",
+            "Requirement already satisfied: language-data>=1.2 in /usr/local/lib/python3.10/dist-packages (from langcodes<4.0.0,>=3.2.0->spacy) (1.2.0)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.10/dist-packages (from pydantic!=1.8,!=1.8.1,<3.0.0,>=1.7.4->spacy) (0.7.0)\n",
+            "Requirement already satisfied: pydantic-core==2.23.3 in /usr/local/lib/python3.10/dist-packages (from pydantic!=1.8,!=1.8.1,<3.0.0,>=1.7.4->spacy) (2.23.3)\n",
+            "Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.10/dist-packages (from python-dateutil>=2.8.2->pandas) (1.16.0)\n",
+            "Requirement already satisfied: charset-normalizer<4,>=2 in /usr/local/lib/python3.10/dist-packages (from requests<3.0.0,>=2.13.0->spacy) (3.3.2)\n",
+            "Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.10/dist-packages (from requests<3.0.0,>=2.13.0->spacy) (3.8)\n",
+            "Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.10/dist-packages (from requests<3.0.0,>=2.13.0->spacy) (2.0.7)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.10/dist-packages (from requests<3.0.0,>=2.13.0->spacy) (2024.8.30)\n",
+            "Requirement already satisfied: blis<0.8.0,>=0.7.8 in /usr/local/lib/python3.10/dist-packages (from thinc<8.3.0,>=8.2.2->spacy) (0.7.11)\n",
+            "Requirement already satisfied: confection<1.0.0,>=0.0.1 in /usr/local/lib/python3.10/dist-packages (from thinc<8.3.0,>=8.2.2->spacy) (0.1.5)\n",
+            "Requirement already satisfied: click>=8.0.0 in /usr/local/lib/python3.10/dist-packages (from typer<1.0.0,>=0.3.0->spacy) (8.1.7)\n",
+            "Requirement already satisfied: shellingham>=1.3.0 in /usr/local/lib/python3.10/dist-packages (from typer<1.0.0,>=0.3.0->spacy) (1.5.4)\n",
+            "Requirement already satisfied: rich>=10.11.0 in /usr/local/lib/python3.10/dist-packages (from typer<1.0.0,>=0.3.0->spacy) (13.8.1)\n",
+            "Requirement already satisfied: cloudpathlib<1.0.0,>=0.7.0 in /usr/local/lib/python3.10/dist-packages (from weasel<0.5.0,>=0.1.0->spacy) (0.19.0)\n",
+            "Requirement already satisfied: smart-open<8.0.0,>=5.2.1 in /usr/local/lib/python3.10/dist-packages (from weasel<0.5.0,>=0.1.0->spacy) (7.0.4)\n",
+            "Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.10/dist-packages (from jinja2->spacy) (2.1.5)\n",
+            "Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.10/dist-packages (from sympy->torch) (1.3.0)\n",
+            "Requirement already satisfied: marisa-trie>=0.7.7 in /usr/local/lib/python3.10/dist-packages (from language-data>=1.2->langcodes<4.0.0,>=3.2.0->spacy) (1.2.0)\n",
+            "Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/lib/python3.10/dist-packages (from rich>=10.11.0->typer<1.0.0,>=0.3.0->spacy) (3.0.0)\n",
+            "Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/lib/python3.10/dist-packages (from rich>=10.11.0->typer<1.0.0,>=0.3.0->spacy) (2.16.1)\n",
+            "Requirement already satisfied: wrapt in /usr/local/lib/python3.10/dist-packages (from smart-open<8.0.0,>=5.2.1->weasel<0.5.0,>=0.1.0->spacy) (1.16.0)\n",
+            "Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.10/dist-packages (from markdown-it-py>=2.2.0->rich>=10.11.0->typer<1.0.0,>=0.3.0->spacy) (0.1.2)\n"
+          ]
+        }
+      ],
+      "source": [
+        "pip install pandas spacy transformers torch scikit-learn"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "pip install en_core_web_sm"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "-OZ_eV4PBkH1",
+        "outputId": "0ea86902-f436-4279-f7ed-d7fcd2b9dec2",
+        "collapsed": true
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: en_core_web_sm in /usr/local/lib/python3.10/dist-packages (3.7.1)\n",
+            "Requirement already satisfied: spacy<3.8.0,>=3.7.2 in /usr/local/lib/python3.10/dist-packages (from en_core_web_sm) (3.7.6)\n",
+            "Requirement already satisfied: spacy-legacy<3.1.0,>=3.0.11 in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (3.0.12)\n",
+            "Requirement already satisfied: spacy-loggers<2.0.0,>=1.0.0 in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (1.0.5)\n",
+            "Requirement already satisfied: murmurhash<1.1.0,>=0.28.0 in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (1.0.10)\n",
+            "Requirement already satisfied: cymem<2.1.0,>=2.0.2 in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (2.0.8)\n",
+            "Requirement already satisfied: preshed<3.1.0,>=3.0.2 in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (3.0.9)\n",
+            "Requirement already satisfied: thinc<8.3.0,>=8.2.2 in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (8.2.5)\n",
+            "Requirement already satisfied: wasabi<1.2.0,>=0.9.1 in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (1.1.3)\n",
+            "Requirement already satisfied: srsly<3.0.0,>=2.4.3 in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (2.4.8)\n",
+            "Requirement already satisfied: catalogue<2.1.0,>=2.0.6 in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (2.0.10)\n",
+            "Requirement already satisfied: weasel<0.5.0,>=0.1.0 in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (0.4.1)\n",
+            "Requirement already satisfied: typer<1.0.0,>=0.3.0 in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (0.12.5)\n",
+            "Requirement already satisfied: tqdm<5.0.0,>=4.38.0 in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (4.66.5)\n",
+            "Requirement already satisfied: requests<3.0.0,>=2.13.0 in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (2.32.3)\n",
+            "Requirement already satisfied: pydantic!=1.8,!=1.8.1,<3.0.0,>=1.7.4 in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (2.9.1)\n",
+            "Requirement already satisfied: jinja2 in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (3.1.4)\n",
+            "Requirement already satisfied: setuptools in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (71.0.4)\n",
+            "Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (24.1)\n",
+            "Requirement already satisfied: langcodes<4.0.0,>=3.2.0 in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (3.4.0)\n",
+            "Requirement already satisfied: numpy>=1.19.0 in /usr/local/lib/python3.10/dist-packages (from spacy<3.8.0,>=3.7.2->en_core_web_sm) (1.26.4)\n",
+            "Requirement already satisfied: language-data>=1.2 in /usr/local/lib/python3.10/dist-packages (from langcodes<4.0.0,>=3.2.0->spacy<3.8.0,>=3.7.2->en_core_web_sm) (1.2.0)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.10/dist-packages (from pydantic!=1.8,!=1.8.1,<3.0.0,>=1.7.4->spacy<3.8.0,>=3.7.2->en_core_web_sm) (0.7.0)\n",
+            "Requirement already satisfied: pydantic-core==2.23.3 in /usr/local/lib/python3.10/dist-packages (from pydantic!=1.8,!=1.8.1,<3.0.0,>=1.7.4->spacy<3.8.0,>=3.7.2->en_core_web_sm) (2.23.3)\n",
+            "Requirement already satisfied: typing-extensions>=4.6.1 in /usr/local/lib/python3.10/dist-packages (from pydantic!=1.8,!=1.8.1,<3.0.0,>=1.7.4->spacy<3.8.0,>=3.7.2->en_core_web_sm) (4.12.2)\n",
+            "Requirement already satisfied: charset-normalizer<4,>=2 in /usr/local/lib/python3.10/dist-packages (from requests<3.0.0,>=2.13.0->spacy<3.8.0,>=3.7.2->en_core_web_sm) (3.3.2)\n",
+            "Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.10/dist-packages (from requests<3.0.0,>=2.13.0->spacy<3.8.0,>=3.7.2->en_core_web_sm) (3.8)\n",
+            "Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.10/dist-packages (from requests<3.0.0,>=2.13.0->spacy<3.8.0,>=3.7.2->en_core_web_sm) (2.0.7)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.10/dist-packages (from requests<3.0.0,>=2.13.0->spacy<3.8.0,>=3.7.2->en_core_web_sm) (2024.8.30)\n",
+            "Requirement already satisfied: blis<0.8.0,>=0.7.8 in /usr/local/lib/python3.10/dist-packages (from thinc<8.3.0,>=8.2.2->spacy<3.8.0,>=3.7.2->en_core_web_sm) (0.7.11)\n",
+            "Requirement already satisfied: confection<1.0.0,>=0.0.1 in /usr/local/lib/python3.10/dist-packages (from thinc<8.3.0,>=8.2.2->spacy<3.8.0,>=3.7.2->en_core_web_sm) (0.1.5)\n",
+            "Requirement already satisfied: click>=8.0.0 in /usr/local/lib/python3.10/dist-packages (from typer<1.0.0,>=0.3.0->spacy<3.8.0,>=3.7.2->en_core_web_sm) (8.1.7)\n",
+            "Requirement already satisfied: shellingham>=1.3.0 in /usr/local/lib/python3.10/dist-packages (from typer<1.0.0,>=0.3.0->spacy<3.8.0,>=3.7.2->en_core_web_sm) (1.5.4)\n",
+            "Requirement already satisfied: rich>=10.11.0 in /usr/local/lib/python3.10/dist-packages (from typer<1.0.0,>=0.3.0->spacy<3.8.0,>=3.7.2->en_core_web_sm) (13.8.1)\n",
+            "Requirement already satisfied: cloudpathlib<1.0.0,>=0.7.0 in /usr/local/lib/python3.10/dist-packages (from weasel<0.5.0,>=0.1.0->spacy<3.8.0,>=3.7.2->en_core_web_sm) (0.19.0)\n",
+            "Requirement already satisfied: smart-open<8.0.0,>=5.2.1 in /usr/local/lib/python3.10/dist-packages (from weasel<0.5.0,>=0.1.0->spacy<3.8.0,>=3.7.2->en_core_web_sm) (7.0.4)\n",
+            "Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.10/dist-packages (from jinja2->spacy<3.8.0,>=3.7.2->en_core_web_sm) (2.1.5)\n",
+            "Requirement already satisfied: marisa-trie>=0.7.7 in /usr/local/lib/python3.10/dist-packages (from language-data>=1.2->langcodes<4.0.0,>=3.2.0->spacy<3.8.0,>=3.7.2->en_core_web_sm) (1.2.0)\n",
+            "Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/lib/python3.10/dist-packages (from rich>=10.11.0->typer<1.0.0,>=0.3.0->spacy<3.8.0,>=3.7.2->en_core_web_sm) (3.0.0)\n",
+            "Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/lib/python3.10/dist-packages (from rich>=10.11.0->typer<1.0.0,>=0.3.0->spacy<3.8.0,>=3.7.2->en_core_web_sm) (2.16.1)\n",
+            "Requirement already satisfied: wrapt in /usr/local/lib/python3.10/dist-packages (from smart-open<8.0.0,>=5.2.1->weasel<0.5.0,>=0.1.0->spacy<3.8.0,>=3.7.2->en_core_web_sm) (1.16.0)\n",
+            "Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.10/dist-packages (from markdown-it-py>=2.2.0->rich>=10.11.0->typer<1.0.0,>=0.3.0->spacy<3.8.0,>=3.7.2->en_core_web_sm) (0.1.2)\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pandas as pd\n",
+        "import spacy\n",
+        "from transformers import pipeline\n",
+        "from sklearn.model_selection import train_test_split\n",
+        "from sklearn.metrics import classification_report, accuracy_score, confusion_matrix\n",
+        "import matplotlib.pyplot as plt\n",
+        "import seaborn as sns\n",
+        "import json\n"
+      ],
+      "metadata": {
+        "id": "0Zi9snPE80mj"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "\n",
+        "# Load JSON data\n",
+        "def load_json(filename):\n",
+        "    with open(filename, 'r', encoding='utf-8') as f:\n",
+        "        data = [json.loads(line) for line in f]\n",
+        "    return pd.DataFrame(data)\n",
+        "\n",
+        "# Load business, checkin, tip, review, and user data\n",
+        "business_df = load_json('/content/yelp_academic_dataset_business.json')\n",
+        "checkin_df = load_json('/content/yelp_academic_dataset_checkin.json')\n",
+        "tip_df = load_json('/content/yelp_academic_dataset_tip.json')\n",
+        "review_df = load_json('review.json')\n",
+        "user_df = load_json('user.json')\n",
+        "\n",
+        "# Check the first few rows of the review data\n",
+        "print(review_df.head())\n"
+      ],
+      "metadata": {
+        "id": "LqDAAvv1JDml",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 332
+        },
+        "outputId": "66bdd675-18d2-48c0-ca95-df5ff51f8687"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "FileNotFoundError",
+          "evalue": "[Errno 2] No such file or directory: 'review.json'",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mFileNotFoundError\u001b[0m                         Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-6-c6c0d4683688>\u001b[0m in \u001b[0;36m<cell line: 11>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      9\u001b[0m \u001b[0mcheckin_df\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mload_json\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'/content/yelp_academic_dataset_checkin.json'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     10\u001b[0m \u001b[0mtip_df\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mload_json\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'/content/yelp_academic_dataset_tip.json'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 11\u001b[0;31m \u001b[0mreview_df\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mload_json\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'review.json'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     12\u001b[0m \u001b[0muser_df\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mload_json\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'user.json'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     13\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m<ipython-input-6-c6c0d4683688>\u001b[0m in \u001b[0;36mload_json\u001b[0;34m(filename)\u001b[0m\n\u001b[1;32m      1\u001b[0m \u001b[0;31m# Load JSON data\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      2\u001b[0m \u001b[0;32mdef\u001b[0m \u001b[0mload_json\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mfilename\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 3\u001b[0;31m     \u001b[0;32mwith\u001b[0m \u001b[0mopen\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mfilename\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m'r'\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mencoding\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m'utf-8'\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0mf\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      4\u001b[0m         \u001b[0mdata\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;34m[\u001b[0m\u001b[0mjson\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mloads\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mline\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;32mfor\u001b[0m \u001b[0mline\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mf\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m     \u001b[0;32mreturn\u001b[0m \u001b[0mpd\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mDataFrame\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mdata\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mFileNotFoundError\u001b[0m: [Errno 2] No such file or directory: 'review.json'"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Keep relevant columns from the review dataset\n",
+        "review_df = review_df[['review_id', 'text', 'stars', 'business_id']]\n",
+        "\n",
+        "# Load spaCy model for NLP tasks\n",
+        "import spacy\n",
+        "nlp = spacy.load(\"en_core_web_sm\")\n",
+        "\n",
+        "# Predefined business aspects\n",
+        "aspects = ['food quality', 'service', 'ambiance', 'pricing', 'cleanliness']\n",
+        "\n",
+        "# Cleaning the review text (optional but recommended)\n",
+        "def clean_text(text):\n",
+        "    doc = nlp(text.lower())\n",
+        "    tokens = [token.lemma_ for token in doc if not token.is_stop and not token.is_punct]\n",
+        "    return \" \".join(tokens)\n",
+        "\n",
+        "# Apply cleaning to the review text\n",
+        "review_df['cleaned_text'] = review_df['text'].apply(clean_text)\n"
+      ],
+      "metadata": {
+        "id": "KNsXlG8cJmtW",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 211
+        },
+        "outputId": "62ab009a-acd2-44ea-e5a0-7e7aac385662"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "NameError",
+          "evalue": "name 'review_df' is not defined",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mNameError\u001b[0m                                 Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-7-933302b74c23>\u001b[0m in \u001b[0;36m<cell line: 2>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      1\u001b[0m \u001b[0;31m# Keep relevant columns from the review dataset\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 2\u001b[0;31m \u001b[0mreview_df\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mreview_df\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;34m'review_id'\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m'text'\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m'stars'\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m'business_id'\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      3\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      4\u001b[0m \u001b[0;31m# Load spaCy model for NLP tasks\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mspacy\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mNameError\u001b[0m: name 'review_df' is not defined"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Extracting predefined aspects from reviews\n",
+        "def extract_aspects(review):\n",
+        "    doc = nlp(review)\n",
+        "    extracted_aspects = []\n",
+        "    for token in doc:\n",
+        "        # Check if the token matches any predefined aspects\n",
+        "        if token.lemma_ in aspects:\n",
+        "            extracted_aspects.append(token.lemma_)\n",
+        "    return extracted_aspects\n",
+        "\n",
+        "# Apply aspect extraction to the reviews\n",
+        "review_df['aspects'] = review_df['cleaned_text'].apply(extract_aspects)\n"
+      ],
+      "metadata": {
+        "id": "wrtapjzIJx67"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from transformers import pipeline\n",
+        "\n",
+        "# Load the pre-trained sentiment analysis model\n",
+        "sentiment_pipeline = pipeline(\"sentiment-analysis\")\n",
+        "\n",
+        "# Sentiment classification function\n",
+        "def classify_sentiment(aspect, review):\n",
+        "    # Consider the part of the review mentioning the aspect\n",
+        "    aspect_review = f\"{aspect}: {review}\"\n",
+        "    sentiment = sentiment_pipeline(aspect_review)[0]\n",
+        "    return sentiment['label']\n",
+        "\n",
+        "# Classify sentiment for each extracted aspect in the review\n",
+        "review_df['aspect_sentiments'] = review_df.apply(\n",
+        "    lambda x: [(aspect, classify_sentiment(aspect, x['cleaned_text'])) for aspect in x['aspects']], axis=1\n",
+        ")\n"
+      ],
+      "metadata": {
+        "id": "yop5CC6zJ0BY"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def generate_insights(df):\n",
+        "    insights = {}\n",
+        "    for aspect in aspects:\n",
+        "        # Filter reviews mentioning the specific aspect\n",
+        "        aspect_reviews = df[df['aspects'].apply(lambda x: aspect in x)]\n",
+        "\n",
+        "        # Count positive, neutral, and negative sentiments for the aspect\n",
+        "        sentiment_counts = aspect_reviews['aspect_sentiments'].apply(lambda x: [s[1] for s in x if s[0] == aspect])\n",
+        "        sentiment_counts = sentiment_counts.explode().value_counts()\n",
+        "\n",
+        "        # Save the counts to insights dictionary\n",
+        "        insights[aspect] = {\n",
+        "            'positive': sentiment_counts.get('POSITIVE', 0),\n",
+        "            'neutral': sentiment_counts.get('NEUTRAL', 0),\n",
+        "            'negative': sentiment_counts.get('NEGATIVE', 0)\n",
+        "        }\n",
+        "\n",
+        "    return insights\n",
+        "\n",
+        "# Generate insights for businesses\n",
+        "business_insights = generate_insights(review_df)\n",
+        "\n",
+        "# Display the insights\n",
+        "for aspect, counts in business_insights.items():\n",
+        "    print(f\"\\nAspect: {aspect.capitalize()}\")\n",
+        "    print(f\"Positive reviews: {counts['positive']}\")\n",
+        "    print(f\"Neutral reviews: {counts['neutral']}\")\n",
+        "    print(f\"Negative reviews: {counts['negative']}\")\n"
+      ],
+      "metadata": {
+        "id": "bD-yyFdVPWQy"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from sklearn.metrics import precision_score, recall_score, f1_score, confusion_matrix, accuracy_score\n",
+        "\n",
+        "# Suppose we have ground truth sentiment labels for evaluation\n",
+        "y_true = review_df['true_sentiments']  # Add the true labels if available\n",
+        "y_pred = review_df['aspect_sentiments'].apply(lambda x: [sent for _, sent in x])\n",
+        "\n",
+        "# Flatten the lists of true and predicted labels\n",
+        "y_true = [item for sublist in y_true for item in sublist]\n",
+        "y_pred = [item for sublist in y_pred for item in sublist]\n",
+        "\n",
+        "# Calculate evaluation metrics\n",
+        "precision = precision_score(y_true, y_pred, average='macro')\n",
+        "recall = recall_score(y_true, y_pred, average='macro')\n",
+        "f1 = f1_score(y_true, y_pred, average='macro')\n",
+        "\n",
+        "print(f\"Precision: {precision}, Recall: {recall}, F1-Score: {f1}\")\n",
+        "\n",
+        "# Confusion Matrix\n",
+        "cm = confusion_matrix(y_true, y_pred, labels=['positive', 'neutral', 'negative'])\n",
+        "sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')\n",
+        "plt.show()\n",
+        "\n",
+        "# Accuracy\n",
+        "accuracy = accuracy_score(y_true, y_pred)\n",
+        "print(f\"Accuracy: {accuracy}\")\n"
+      ],
+      "metadata": {
+        "id": "je2jpwTjPi8Q"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import matplotlib.pyplot as plt\n",
+        "import seaborn as sns\n",
+        "\n",
+        "# Convert insights into a DataFrame for plotting\n",
+        "insights_df = pd.DataFrame(business_insights).T\n",
+        "\n",
+        "# Plot aspect sentiment distribution\n",
+        "insights_df.plot(kind='bar', stacked=True)\n",
+        "plt.title('Aspect Sentiment Distribution')\n",
+        "plt.xlabel('Aspects')\n",
+        "plt.ylabel('Count of Sentiments')\n",
+        "plt.legend(title='Sentiment')\n",
+        "plt.show()\n"
+      ],
+      "metadata": {
+        "id": "lmhfHzVkP1Ap"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
